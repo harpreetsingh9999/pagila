@@ -1,0 +1,8 @@
+1. Used DBeaver for setting up the sample database and scripting SQL queries
+2. A new database is created with a name "rollup"
+3. For creating a new rollup table in the rollup database, I used dblink to use "pagila" database
+4. To see how many movies were out for rental for a given week and how many were returned that week,
+I used the logic: outstanding_rentals where the return_date is Null
+and returned_rentals where return_date is NOT Null
+5. Used dblink to use pagila under rollup database
+6. For incremental data update, we can use a python script(psycopg2) to setup the ETL
