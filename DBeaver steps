@@ -1,0 +1,28 @@
+1. Downloaded and installed DBeaver
+2. installed PostgreSQL 17 from the terminal by using "brew install PostgreSQL"
+3. Loaded the sample data by using: 
+    "psql -h localhost -p 5432 -U postgres -d pagila -f pagila-schema.sql
+    psql -h localhost -p 5432 -U postgres -d pagila -f pagila-data.sql"
+4. Created a PostgreSQL connection in DBeaver
+5. Refreshed the connecton to see the pagila database
+6. Created a new database as "rollup" 
+7. Created a new table as weekly_outstanding_rentals by using:
+    "CREATE TABLE weekly_outstanding_rentals (
+    week_beginning DATE PRIMARY KEY,
+    outstanding_rentals INTEGER,
+    returned_rentals INTEGER
+    );"
+
+8. Installed dblink by using "CREATE EXTENSION IF NOT EXISTS dblink;"
+9. Inserted data from pagila.rentals into this "rollup" database using:
+    "INSERT INTO weekly_outstanding_rentals (week_beginning, outstanding_rentals, returned_rentals)
+    SELECT
+    Cast(date_trunc('week', rental_date) as date) AS week_beginning,
+    COUNT(*) FILTER (WHERE return_date IS NULL) AS outstanding_rentals,
+    COUNT(*) FILTER (WHERE return_date IS NOT NULL) AS returned_rentals
+    FROM
+    dblink('dbname=pagila', 'SELECT rental_date, return_date FROM rental') 
+    AS t(rental_date TIMESTAMP, return_date TIMESTAMP)
+    GROUP BY 1
+    ORDER BY 1;"
+
